@@ -104,12 +104,12 @@ public class ControlFrame extends PApplet {
 
     cp5.addSlider("threshold")
       .setPosition(grid(0), grid(3))
-      .setSize(grid(6)-2*guiBufferSize, guiObjectSize)
+      .setSize(512, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
       .setColorActive(guiActive)
       .setRange(-255, 255)
-      .setDecimalPrecision(1)
+      .setDecimalPrecision(0)
       .setLabel("threshold")
       .plugTo(this, "setThreshold")
       .setValue(0)
@@ -117,8 +117,14 @@ public class ControlFrame extends PApplet {
     cp5.getController("threshold").getCaptionLabel().align(ControlP5.CENTER, CENTER);
   }
 
+
+
   public void draw() {
     background(backgroundColor);
+  }
+
+  void mouseReleased() {
+    parent.redraw();
   }
 
   public void reset() {

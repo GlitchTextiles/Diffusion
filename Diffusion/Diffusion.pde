@@ -86,10 +86,11 @@ void setup() {
   GUI = new ControlFrame(this, controlFrame_x, controlFrame_y, controlFrame_w, controlFrame_h);
   banner=generateBanner();
   background(backgroundColor);
+  noLoop();
 }
 
 void draw() {
-  if (src != null && buffer != null) {
+  if (buffer != null) {
 
     Swatches palette = new Swatches();
 
@@ -117,15 +118,13 @@ void draw() {
 PImage dither(PImage _image, Swatches _palette) {
 
   // 1. sample pixel
-  // 2. apply error
-  // 3. select candidate from palette
-  // 4. propagate error
-  // 5. write candidate to image
+  // 2. select candidate from palette
+  // 3. write candidate to image
+  // 4. calculate and propagate error
 
   _image.loadPixels();
 
   color candidate=color(0);
-  float[][] errorMap = new float[_image.width*_image.height][3];
   float[][] kernel = new float[0][0];
   int start=0;
 
@@ -161,22 +160,9 @@ PImage dither(PImage _image, Swatches _palette) {
 
       int pxCoord = x+_image.width*y;
       color px = _image.pixels[pxCoord]+threshold;
+      candidate = _palette.rgbClosest(px).getColor();
+      _image.pixels[pxCoord]=candidate;
 
-      // 2. apply error
-      float errorR = errorMap[pxCoord][0];
-      float errorG = errorMap[pxCoord][1];
-      float errorB = errorMap[pxCoord][2];
-
-      int r = int(constrain((px >> 16 & 0xFF) + errorR, 0, 255));
-      int g = int(constrain((px >> 8 & 0xFF) + errorG, 0, 255));
-      int b = int(constrain((px >> 0 & 0xFF) + errorB, 0, 255)); 
-
-      color pxCorrected = 0xFF << 24 | r << 16 | g << 8 | b;
-
-      // 3. select candidate
-      candidate = _palette.rgbClosest(pxCorrected).getColor();
-
-      // 4. propogate error
       for (int i = 0; i < kernel.length; i++) {
         if (i+y < _image.height) {
           float[] kernel_row = kernel[i];
@@ -184,27 +170,31 @@ PImage dither(PImage _image, Swatches _palette) {
             if ((j+x-start) < _image.width) {               
               float kernel_value = kernel_row[j];
               if (kernel_value != 0) {
-                int coord = (x+j-start)+_image.width*(y+i);
-                errorMap[coord][0] = kernel_value * float((px >> 16 & 0xFF) - (candidate >> 16 & 0xFF));
-                errorMap[coord][1] = kernel_value * float((px >> 8 & 0xFF) - (candidate >> 8 & 0xFF));
-                errorMap[coord][2] = kernel_value * float((px >> 0 & 0xFF) - (candidate >> 0 & 0xFF));
+
+                int px2Coord = (x+j-start)+_image.width*(y+i);
+                color px2 = _image.pixels[px2Coord];
+
+                float errorR = kernel_value * ((px >> 16 & 0xFF) - (candidate >> 16 & 0xFF));
+                float errorG = kernel_value * ((px >> 8 & 0xFF) - (candidate >> 8 & 0xFF));
+                float errorB = kernel_value * ((px >> 0 & 0xFF) - (candidate >> 0 & 0xFF));
+
+                int r = int(constrain((px2 >> 16 & 0xFF) + errorR, 0, 255));
+                int g = int(constrain((px2 >> 8 & 0xFF) + errorG, 0, 255));
+                int b = int(constrain((px2 >> 0 & 0xFF) + errorB, 0, 255));
+
+                _image.pixels[px2Coord] = 0xFF << 24 | r << 16 | g << 8 | b;
               }
             }
           }
         }
       }
-
-      // 5. write pixel to image
-      _image.pixels[pxCoord]=candidate;
     }
   }
-
   _image.updatePixels();
-
   return _image;
 }
 
-
+// Moved inside Kernel class. Delete when class is fully implemented.
 float[][] normalize(float[][] matrix) {
 
   float[][] normalized = new float[matrix.length][matrix[0].length];
@@ -225,123 +215,4 @@ float[][] normalize(float[][] matrix) {
   }
 
   return normalized;
-}
-
-
-class Kernel {
-
-  int rows;
-  int cols;
-  int origin;
-
-  float[][] matrix;
-  float[][] normalized;
-
-  Group group;
-  ControlP5 controlContext;
-
-  Kernel(int _rows, int _cols, ControlP5 _controlContext) {
-    rows=_rows;
-    cols=_cols;
-    matrix = new float[rows][cols];
-    origin=0;
-    controlContext=_controlContext;
-    group = controlContext.addGroup("kernel");
-
-    controlContext.addButton("add_row")
-      .setPosition(grid(0), grid(4))
-      .setSize(guiObjectSize, guiObjectSize)
-      .setColorForeground(guiForeground)
-      .setColorBackground(guiBackground)
-      .setColorActive(guiActive)
-      .setLabel("add\nrow")
-      .plugTo(this, "addRow")
-      ;
-    controlContext.getController("add_row").getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    
-    controlContext.addButton("remove_row")
-      .setPosition(grid(1), grid(4))
-      .setSize(guiObjectSize, guiObjectSize)
-      .setColorForeground(guiForeground)
-      .setColorBackground(guiBackground)
-      .setColorActive(guiActive)
-      .setLabel("remove\nrow")
-      .plugTo(this, "remRow")
-      ;
-    controlContext.getController("remove_row").getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    
-    controlContext.addButton("add_column")
-      .setPosition(grid(2), grid(4))
-      .setSize(guiObjectSize, guiObjectSize)
-      .setColorForeground(guiForeground)
-      .setColorBackground(guiBackground)
-      .setColorActive(guiActive)
-      .setLabel("add\nrow")
-      .plugTo(this, "addCol")
-      ;
-    controlContext.getController("add_column").getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    
-    controlContext.addButton("remove_column")
-      .setPosition(grid(3), grid(4))
-      .setSize(guiObjectSize, guiObjectSize)
-      .setColorForeground(guiForeground)
-      .setColorBackground(guiBackground)
-      .setColorActive(guiActive)
-      .setLabel("remove\ncolumn")
-      .plugTo(this, "remCol")
-      ;
-    controlContext.getController("remove_column").getCaptionLabel().align(ControlP5.CENTER, CENTER);
-  }
-  
-  void addRow(){
-    
-  }
-  void remRow(){
-    
-  }
-  void addCol(){
-    
-  }
-  void remCol(){
-    
-  }
-
-  void update() {
-    controlContext.remove("kernel");
-    group = controlContext.addGroup("kernel");
-    for (int r = 0; r < matrix.length; r++) {
-      for (int c = 0; c < matrix[0].length; c++) {
-        controlContext.addNumberbox("kernel"+r+c)
-          .setPosition(grid(c), grid(r)+grid(5))
-          .setSize(guiObjectSize, guiObjectSize)
-          .setColorForeground(guiForeground)
-          .setColorBackground(guiBackground)
-          .setColorActive(guiActive)
-          .setScrollSensitivity(1)
-          .setDecimalPrecision(0)
-          .moveTo(group)
-          ;
-      }
-    }
-  }
-
-  void normalize(float[][] _matrix) {
-
-    this.normalized = new float[_matrix.length][_matrix[0].length];
-    float sum=0;
-
-    for (int r = 0; r < _matrix.length; r++) {
-      for (int c = 0; c < _matrix[0].length; c++) {
-
-        sum+=abs(_matrix[r][c]);
-      }
-    }
-    if (sum != 0.0) {
-      for (int r = 0; r < _matrix.length; r++) {
-        for (int c = 0; c < _matrix[r].length; c++) {
-          this.normalized[r][c] = _matrix[r][c]/sum;
-        }
-      }
-    }
-  }
 }
