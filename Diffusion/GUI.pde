@@ -25,8 +25,7 @@ public class ControlFrame extends PApplet {
     cp5 = new ControlP5(this);   
     frameRate(30);
 
-    kernel = new Kernel(2, 3, this.cp5);
-    kernel.update();
+    kernel = new Kernel(this.cp5);
 
     // row 0 controls
     cp5.addButton("open_image")
@@ -121,6 +120,7 @@ public class ControlFrame extends PApplet {
 
   public void draw() {
     background(backgroundColor);
+    kernel.update();
   }
 
   void mouseReleased() {

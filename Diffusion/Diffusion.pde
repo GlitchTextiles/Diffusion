@@ -1,3 +1,8 @@
+//resources
+// https://en.wikipedia.org/wiki/Dither
+// https://web.archive.org/web/20190316064436/http://www.efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
+// https://tannerhelland.com/2012/12/28/dithering-eleven-algorithms-source-code.html
+
 import controlP5.*;
 import java.util.*;
 
@@ -63,8 +68,8 @@ float[][] jarvis_judice_nincke = {
 };
 
 float[][] experimental = {
-  {0, 0, 0}, 
-  {1, 0, 1}
+  {0, 2}, 
+  {3, 1}
 };
 
 
