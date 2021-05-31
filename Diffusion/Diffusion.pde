@@ -17,7 +17,6 @@ PImage src=null;
 PImage buffer=null;
 PGraphics banner;
 
-int palette_mode, dither_mode;
 color threshold;
 
 //these are used by the GUI and associated objects
@@ -46,18 +45,15 @@ int screen_h = 320;
 
 ControlFrame GUI;
 Kernel diffusionKernel;
-Swatches pci, bw, palette;
+Palette pci, bw, palette;
+PaletteList palettes;
 
 void setup() {
   size(10, 10);
   surface.setSize(screen_w, screen_h);
   surface.setLocation(screen_x, screen_y);
-  //load the palette: convert from hex values in a .txt to Swatches object
-  pci = new Swatches(loadStrings(dataPath("")+"/palette/palette.txt"));
-  bw = new Swatches();
-  bw.add(color(0));
-  bw.add(color(255));
-  palette = new Swatches();
+  pci = new Palette("Pure Country Weavers", loadStrings(dataPath("")+"/palette/palette.txt"));
+  bw = new Palette("Black and White").add(color(0)).add(color(255));
   GUI = new ControlFrame(this, controlFrame_x, controlFrame_y, controlFrame_w, controlFrame_h);
   banner=generateBanner();
   background(backgroundColor);
@@ -67,8 +63,8 @@ void setup() {
 void draw() {
   background(backgroundColor);
   if (buffer != null) {
-    buffer = dither(src.copy(), palette);
     if (preview) { 
+      buffer = dither(src.copy(), palettes.get());
       image(buffer, 0, 0);
     } else {
       image(src, 0, 0);
@@ -78,7 +74,7 @@ void draw() {
   }
 }
 
-PImage dither(PImage _image, Swatches _palette) {
+PImage dither(PImage _image, Palette _palette) {
 
   // 1. sample pixel
   // 2. select candidate from palette

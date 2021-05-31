@@ -1,8 +1,8 @@
 public class ControlFrame extends PApplet {
 
   int w, h, x, y;
-  ControlP5 cp5;
   PApplet parent;
+  ControlP5 cp5;
   RadioButton dither_mode_radio;
 
   public ControlFrame(PApplet _parent, int _x, int _y, int _w, int _h) {
@@ -24,8 +24,6 @@ public class ControlFrame extends PApplet {
     surface.setLocation(x, y);
     cp5 = new ControlP5(this);   
     frameRate(30);
-
-    diffusionKernel = new Kernel(this.cp5);
 
     // row 0 controls
     cp5.addButton("open_image")
@@ -61,22 +59,16 @@ public class ControlFrame extends PApplet {
       ;
     cp5.getController("preview").getCaptionLabel().align(ControlP5.CENTER, CENTER);
 
-    dither_mode_radio= cp5.addRadioButton("palette_mode")
-      .setPosition(grid(0), grid(1))
+    cp5.addButton("quit")
+      .setPosition(this.width-grid(1), grid(0))
       .setSize(guiObjectSize, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
       .setColorActive(guiActive)
-      .setItemsPerRow(2)
-      .setSpacingColumn(guiBufferSize)
-      .addItem("BW", 0)
-      .addItem("COLOR", 1)
-      .plugTo(this, "setPaletteMode")
-      .activate(0)
+      .setLabel("QUIT")
+      .plugTo(this, "exit")
       ;
-    for (Toggle t : dither_mode_radio.getItems()) {
-      t.getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    }
+    cp5.getController("quit").getCaptionLabel().align(ControlP5.CENTER, CENTER);
 
     cp5.addSlider("threshold")
       .setPosition(grid(0), grid(2))
@@ -91,11 +83,13 @@ public class ControlFrame extends PApplet {
       .setValue(0)
       ;
     cp5.getController("threshold").getCaptionLabel().align(ControlP5.CENTER, CENTER);
+
+    diffusionKernel = new Kernel(this.cp5);
+    palettes = new PaletteList(this.cp5).add(bw).add(pci);
   }
 
   public void draw() {
     background(backgroundColor);
-    diffusionKernel.update();
   }
 
   void mouseReleased() {
@@ -115,10 +109,6 @@ public class ControlFrame extends PApplet {
       palette=pci.copy();
       break;
     }
-  }
-
-  public void setDitherMode(int _id) {
-    dither_mode = _id;
   }
 
   public void setThreshold(float _value) {

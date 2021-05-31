@@ -1,16 +1,17 @@
 public class Kernel {
 
-  int rows=1;
-  int cols=1;
-  int origin=0;
+  public int rows=1;
+  public int cols=1;
+  public int origin=0;
 
-  Numberbox[][] matrix;
-  ControlP5 controlContext;
+  public Numberbox[][] matrix;
+  public ControlP5 controlContext;
 
   public Kernel(ControlP5 _controlContext) {
-    matrix = new Numberbox[5][5];
-    controlContext=_controlContext;
-    initGUI();
+    this.matrix = new Numberbox[5][5];
+    this.controlContext=_controlContext;
+    this.initGUI();
+    this.update();
   }
 
   public void initGUI() {
@@ -102,26 +103,32 @@ public class Kernel {
 
   public void addRow() {
     if (rows < this.matrix.length) ++rows;
+    this.update();
   }
 
   public void remRow() {
     if (rows > 1) --rows;
+    this.update();
   }
 
   public void addCol() {
     if (cols < this.matrix[0].length) ++cols;
+    this.update();
   }
 
   public void remCol() {
     if (cols > origin+1) --cols;
+    this.update();
   }
 
   public void decOrigin() {
     if ( origin > 0 ) --origin;
+    this.update();
   }
 
   public void incOrigin() {
     if ( origin < cols-1 ) ++origin;
+    this.update();
   }
 
   public void update() {
