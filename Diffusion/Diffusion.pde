@@ -11,10 +11,10 @@ import java.util.*;
 String inputPath;
 String outputPath;
 
-public boolean preview;
+boolean preview, resample, evenX, evenY;
 
-PImage src=null;
-PImage buffer=null;
+PImage src;
+PImage buffer;
 PGraphics banner;
 
 color threshold;
@@ -57,14 +57,16 @@ void setup() {
   GUI = new ControlFrame(this, controlFrame_x, controlFrame_y, controlFrame_w, controlFrame_h);
   banner=generateBanner();
   background(backgroundColor);
+  noSmooth();
   noLoop();
 }
 
 void draw() {
   background(backgroundColor);
-  if (buffer != null) {
+  if (buffer != null && palettes.get() != null) {
     if (preview) { 
       buffer = dither(src.copy(), palettes.get());
+      if (resample) resample(buffer);
       image(buffer, 0, 0);
     } else {
       image(src, 0, 0);
@@ -72,6 +74,28 @@ void draw() {
   } else {
     image(banner, 0, 0);
   }
+}
+
+PImage resample(PImage _image) {
+  _image.loadPixels();
+  println("_image.width: "+_image.width+", _image.height: "+_image.height);
+  PImage half = createImage(_image.width/2, _image.height/2, RGB);
+  println("half.width: "+half.width+", half.height: "+half.height);
+  for (int y = 0; y < half.height; y++) {
+    for (int x = 0; x < half.width; x++) {
+      if (evenX && evenY) half.pixels[x+half.width*y] = _image.pixels[(2*x)+_image.width*(2*y)];
+      if (!evenX && evenY) half.pixels[x+half.width*y] = _image.pixels[(2*x+1)+_image.width*(2*y)];
+      if (evenX && !evenY) half.pixels[x+half.width*y] = _image.pixels[(2*x)+_image.width*(2*y+1)];
+      if (!evenX && !evenY) half.pixels[x+half.width*y] = _image.pixels[(2*x+1)+_image.width*(2*y+1)];
+    }
+  }
+  for (int y = 0; y < half.height*2; y++) {
+    for (int x = 0; x < half.width*2; x++) {
+      _image.pixels[(x)+_image.width*(y)] = half.pixels[(x/2)+half.width*(y/2)];
+    }
+  }
+  _image.updatePixels();
+  return _image;
 }
 
 PImage dither(PImage _image, Palette _palette) {

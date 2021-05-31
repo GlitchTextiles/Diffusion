@@ -58,6 +58,42 @@ public class ControlFrame extends PApplet {
       .plugTo(parent, "preview")
       ;
     cp5.getController("preview").getCaptionLabel().align(ControlP5.CENTER, CENTER);
+    
+    cp5.addToggle("resample")
+      .setPosition(grid(3), grid(0))
+      .setSize(guiObjectSize, guiObjectSize)
+      .setColorForeground(guiForeground)
+      .setColorBackground(guiBackground) 
+      .setColorActive(guiActive)
+      .setLabel("HALF\nRES")
+      .plugTo(parent, "resample")
+      ;
+    cp5.getController("resample").getCaptionLabel().align(ControlP5.CENTER, CENTER);
+    
+    cp5.addToggle("evenOddX")
+      .setPosition(grid(4), grid(0))
+      .setSize(guiObjectSize, guiObjectSize)
+      .setColorForeground(guiForeground)
+      .setColorBackground(guiBackground) 
+      .setColorActive(guiActive)
+      .setLabel("X\nEVEN")
+      .plugTo(parent, "evenX")
+      .setValue(0);
+      ;
+    cp5.getController("evenOddX").getCaptionLabel().align(ControlP5.CENTER, CENTER);
+    
+    cp5.addToggle("evenOddY")
+      .setPosition(grid(5), grid(0))
+      .setSize(guiObjectSize, guiObjectSize)
+      .setColorForeground(guiForeground)
+      .setColorBackground(guiBackground) 
+      .setColorActive(guiActive)
+      .setLabel("Y\nEVEN")
+      .plugTo(parent, "evenY")
+      .setValue(0);
+      ;
+    cp5.getController("evenOddY").getCaptionLabel().align(ControlP5.CENTER, CENTER);
+
 
     cp5.addButton("quit")
       .setPosition(this.width-grid(1), grid(0))
