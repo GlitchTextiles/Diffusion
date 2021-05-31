@@ -14,13 +14,13 @@ PGraphics generateBanner() {
   PFont mono = createFont("Andale Mono.ttf", text_size);
 
   String[] bannerText = {
-    "The Ultimate Creative Dithering Tool",
-    "",
-    "Please see README.md for an explanation of what's going on here.",
-    "",
-    "CREDITS:",
+    "The Ultimate Creative Dithering Tool", 
+    "", 
+    "Please see README.md for an explanation of what's going on here.", 
+    "", 
+    "CREDITS:", 
     "  By Phillip David Stearns 2021 for GlitchTextiles GlitchTools", 
-    "  Hat tip to Daniel Temkin's Dither Studies project",
+    "  Hat tip to Daniel Temkin's Dither Studies project", 
     "  GUI created with ControlP5 by Andreas Schlegel"
   };
 

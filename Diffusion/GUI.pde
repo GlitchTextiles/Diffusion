@@ -1,9 +1,9 @@
 public class ControlFrame extends PApplet {
+
   int w, h, x, y;
   ControlP5 cp5;
   PApplet parent;
   RadioButton dither_mode_radio;
-  Kernel kernel;
 
   public ControlFrame(PApplet _parent, int _x, int _y, int _w, int _h) {
     super();   
@@ -25,7 +25,7 @@ public class ControlFrame extends PApplet {
     cp5 = new ControlP5(this);   
     frameRate(30);
 
-    kernel = new Kernel(this.cp5);
+    diffusionKernel = new Kernel(this.cp5);
 
     // row 0 controls
     cp5.addButton("open_image")
@@ -78,32 +78,9 @@ public class ControlFrame extends PApplet {
       t.getCaptionLabel().align(ControlP5.CENTER, CENTER);
     }
 
-    dither_mode_radio= cp5.addRadioButton("dither_mode")
-      .setPosition(grid(0), grid(2))
-      .setSize(guiObjectSize, guiObjectSize)
-      .setColorForeground(guiForeground)
-      .setColorBackground(guiBackground) 
-      .setColorActive(guiActive)
-      .setItemsPerRow(6)
-      .setSpacingColumn(guiBufferSize)
-      .addItem("NONE", 0)
-      .addItem("1D", 1)
-      .addItem("2D", 2)
-      .addItem("FS", 3)
-      .addItem("JJN", 4)
-      .addItem("EXP", 5)
-      .plugTo(this, "setDitherMode")
-      .activate(0)
-      ;
-    for (Toggle t : dither_mode_radio.getItems()) {
-      t.getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    }
-
-    // row 1 controls
-
     cp5.addSlider("threshold")
-      .setPosition(grid(0), grid(3))
-      .setSize(512, guiObjectSize)
+      .setPosition(grid(0), grid(2))
+      .setSize(510, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
       .setColorActive(guiActive)
@@ -116,11 +93,9 @@ public class ControlFrame extends PApplet {
     cp5.getController("threshold").getCaptionLabel().align(ControlP5.CENTER, CENTER);
   }
 
-
-
   public void draw() {
     background(backgroundColor);
-    kernel.update();
+    diffusionKernel.update();
   }
 
   void mouseReleased() {
@@ -132,7 +107,14 @@ public class ControlFrame extends PApplet {
   }
 
   public void setPaletteMode(int _id) {
-    palette_mode = _id;
+    switch(_id) {
+    case 0:
+      palette=bw.copy();
+      break;
+    case 1:
+      palette=pci.copy();
+      break;
+    }
   }
 
   public void setDitherMode(int _id) {

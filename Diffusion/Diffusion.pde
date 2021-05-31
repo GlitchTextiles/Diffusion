@@ -2,6 +2,8 @@
 // https://en.wikipedia.org/wiki/Dither
 // https://web.archive.org/web/20190316064436/http://www.efg2.com/Lab/Library/ImageProcessing/DHALF.TXT
 // https://tannerhelland.com/2012/12/28/dithering-eleven-algorithms-source-code.html
+// inspiration
+// http://danieltemkin.com/DitherStudies/
 
 import controlP5.*;
 import java.util.*;
@@ -18,16 +20,6 @@ PGraphics banner;
 int palette_mode, dither_mode;
 color threshold;
 
-int controlFrame_w = 640;
-int controlFrame_h = 800;
-int controlFrame_x = 0;
-int controlFrame_y = 0;
-
-int screen_x = controlFrame_w;
-int screen_y = 0;
-int screen_w = 600;
-int screen_h = 320;
-
 //these are used by the GUI and associated objects
 int guiObjectSize = 40;
 int guiObjectWidth = 600;
@@ -40,54 +32,32 @@ color guiGroupBackground = color(30);
 color guiBackground = color(60);
 color guiForeground = color(120);
 color guiActive=color(150);
+color guiOrigin=color(127);
+
+int controlFrame_w = 530;
+int controlFrame_h = grid(9);
+int controlFrame_x = 0;
+int controlFrame_y = 0;
+
+int screen_x = controlFrame_w;
+int screen_y = 0;
+int screen_w = 600;
+int screen_h = 320;
 
 ControlFrame GUI;
-
-Swatches pci, bw, randomized;
-
-float[][] none = new float[1][1];
-
-float[][] one_dimension = {
-  {0, 1}
-};
-
-float[][] basic_2D = {
-  {0, 1}, 
-  {1, 0}
-};
-
-float[][] floyd_steinberg = {
-  {0, 0, 7}, 
-  {3, 5, 1}
-};
-
-float[][] jarvis_judice_nincke = {
-  {0, 0, 0, 7, 5}, 
-  {3, 5, 7, 5, 3}, 
-  {1, 3, 5, 3, 1}
-};
-
-float[][] experimental = {
-  {0, 2}, 
-  {3, 1}
-};
-
+Kernel diffusionKernel;
+Swatches pci, bw, palette;
 
 void setup() {
   size(10, 10);
   surface.setSize(screen_w, screen_h);
   surface.setLocation(screen_x, screen_y);
-  frameRate(30);
-
   //load the palette: convert from hex values in a .txt to Swatches object
   pci = new Swatches(loadStrings(dataPath("")+"/palette/palette.txt"));
   bw = new Swatches();
   bw.add(color(0));
   bw.add(color(255));
-  //create a randomized palette from a copy
-  randomized = new Swatches();
-  randomized.replaceSwatches(pci.copy().randomize());
-
+  palette = new Swatches();
   GUI = new ControlFrame(this, controlFrame_x, controlFrame_y, controlFrame_w, controlFrame_h);
   banner=generateBanner();
   background(backgroundColor);
@@ -95,21 +65,9 @@ void setup() {
 }
 
 void draw() {
+  background(backgroundColor);
   if (buffer != null) {
-
-    Swatches palette = new Swatches();
-
-    switch(palette_mode) {
-    case 0:
-      palette=bw.copy();
-      break;
-    case 1:
-      palette=pci;
-      break;
-    }
-
     buffer = dither(src.copy(), palette);
-
     if (preview) { 
       image(buffer, 0, 0);
     } else {
@@ -130,35 +88,8 @@ PImage dither(PImage _image, Swatches _palette) {
   _image.loadPixels();
 
   color candidate=color(0);
-  float[][] kernel = new float[0][0];
-  int start=0;
-
-  switch(dither_mode) {
-  case 0:
-    kernel = normalize(none);
-    start=0;
-    break;
-  case 1:
-    kernel = normalize(one_dimension);
-    start=0;
-    break;
-  case 2:
-    kernel = normalize(basic_2D);
-    start=0;
-    break;
-  case 3:
-    kernel = normalize(floyd_steinberg);
-    start=1;
-    break;
-  case 4:
-    kernel = normalize(jarvis_judice_nincke);
-    start=2;
-    break;
-  case 5:
-    kernel = normalize(experimental);
-    start=1;
-    break;
-  }
+  float[][] kernel = diffusionKernel.getKernel();
+  int start=diffusionKernel.origin;
 
   for (int y = 0; y < _image.height; y++) {
     for (int x = 0; x < _image.width; x++) {
@@ -197,27 +128,4 @@ PImage dither(PImage _image, Swatches _palette) {
   }
   _image.updatePixels();
   return _image;
-}
-
-// Moved inside Kernel class. Delete when class is fully implemented.
-float[][] normalize(float[][] matrix) {
-
-  float[][] normalized = new float[matrix.length][matrix[0].length];
-  float sum=0;
-
-  for (int r = 0; r <matrix.length; r++) {
-    for (int c = 0; c < matrix[0].length; c++) {
-
-      sum+=abs(matrix[r][c]);
-    }
-  }
-  if (sum != 0.0) {
-    for (int r = 0; r < matrix.length; r++) {
-      for (int c = 0; c < matrix[r].length; c++) {
-        normalized[r][c]=matrix[r][c]/sum;
-      }
-    }
-  }
-
-  return normalized;
 }

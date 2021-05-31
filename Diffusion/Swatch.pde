@@ -15,15 +15,15 @@ public class Swatches {
       this.add(new Swatch(hex));
     }
   }
-  
-  public ArrayList<Swatch> randomize(){
+
+  public ArrayList<Swatch> randomize() {
     Collections.shuffle(this.swatches);
     return this.swatches;
   }
-  
-  public Swatches copy(){
+
+  public Swatches copy() {
     Swatches swatches_copy = new Swatches();
-    for(Swatch s:this.swatches){
+    for (Swatch s : this.swatches) {
       swatches_copy.add(s);
     }
     return swatches_copy;
