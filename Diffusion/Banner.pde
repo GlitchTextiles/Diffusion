@@ -14,6 +14,16 @@ PGraphics generateBanner() {
   PFont mono = createFont("Andale Mono.ttf", text_size);
 
   String[] bannerText = {
+    "", 
+    "`.....           `..    `..                                     ", 
+    "`..   `..  `.  `.     `.                   `.                   ", 
+    "`..    `..   `.`. `.`.`. `.`..  `.. `....       `..    `.. `..  ", 
+    "`..    `..`..  `..    `..  `..  `..`..    `.. `..  `..  `..  `..", 
+    "`..    `..`..  `..    `..  `..  `..  `... `..`..    `.. `..  `..", 
+    "`..   `.. `..  `..    `..  `..  `..    `..`.. `..  `..  `..  `..", 
+    "`.....    `..  `..    `..    `..`..`.. `..`..   `..    `...  `..", 
+    "", 
+    "", 
     "The Ultimate Creative Dithering Tool", 
     "", 
     "Please see README.md for an explanation of what's going on here.", 

@@ -137,11 +137,29 @@ public class Kernel {
         if (r == 0 && c < origin) {
           this.matrix[r][c].hide();
         } else if (r == 0 && c == origin) {
-          this.matrix[r][c].show().lock().setColorBackground(guiOrigin);
+          this.matrix[r][c]
+            .show()
+            .lock()
+            .setColorBackground(guiOrigin)
+            .setColorForeground(guiForegroundInactive)
+            .setColorValue(guiValueInactive)
+            ;
         } else if (r < rows && c < cols) {
-          this.matrix[r][c].show().unlock().setColorBackground(guiBackground);
+          this.matrix[r][c]
+            .show()
+            .unlock()
+            .setColorBackground(guiBackground)
+            .setColorForeground(guiForeground)
+            .setColorValue(guiValue)
+            ;
         } else {
-          this.matrix[r][c].hide();
+          this.matrix[r][c]
+            .show()
+            .lock()
+            .setColorBackground(guiBackgroundInactive)
+            .setColorForeground(guiForegroundInactive)
+            .setColorValue(guiValueInactive)
+            ;
         }
       }
     }

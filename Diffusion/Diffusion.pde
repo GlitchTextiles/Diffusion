@@ -30,6 +30,11 @@ color backgroundColor = color(15);
 color guiGroupBackground = color(30);
 color guiBackground = color(60);
 color guiForeground = color(120);
+color guiValue = color(255);
+color guiValueInactive = color(150, 50);
+color guiGroupBackgroundInactive = color(30, 50);
+color guiBackgroundInactive = color(60, 50);
+color guiForegroundInactive = color(120, 50);
 color guiActive=color(150);
 color guiOrigin=color(127);
 
@@ -47,13 +52,15 @@ ControlFrame GUI;
 Kernel diffusionKernel;
 Palette pci, bw, palette;
 PaletteList palettes;
+Gradient gradient;
 
 void setup() {
   size(10, 10);
   surface.setSize(screen_w, screen_h);
   surface.setLocation(screen_x, screen_y);
-  pci = new Palette("Pure Country Weavers", loadStrings(dataPath("")+"/palette/palette.txt"));
+  pci = new Palette("Default 116", loadStrings(dataPath("")+"/palette/palette.txt"));
   bw = new Palette("Black and White").add(color(0)).add(color(255));
+  gradient = new Gradient();
   GUI = new ControlFrame(this, controlFrame_x, controlFrame_y, controlFrame_w, controlFrame_h);
   banner=generateBanner();
   background(backgroundColor);
@@ -63,9 +70,9 @@ void setup() {
 
 void draw() {
   background(backgroundColor);
-  if (buffer != null && palettes.get() != null) {
+  if (buffer != null) {
     if (preview) { 
-      buffer = dither(src.copy(), palettes.get());
+      if (palettes.get() != null) buffer = dither(src.copy(), palettes.get());
       if (resample) resample(buffer);
       image(buffer, 0, 0);
     } else {
@@ -76,11 +83,27 @@ void draw() {
   }
 }
 
+PImage generateGradient(int _width, int _height) {
+  PGraphics g = createGraphics(_width, _height);
+  g.beginDraw();
+  for (int i = 0; i < _height; i++) {
+    g.stroke(gradient.getColor(i/float(_height)));
+    g.line(0, i, _width, i);
+  }
+  g.endDraw();
+  return g.copy();
+}
+
+void generate_gradient() {
+  gradient = new Gradient();
+  src = generateGradient(768, 1000);
+  surface.setSize(src.width, src.height);
+  buffer = src.copy();
+}
+
 PImage resample(PImage _image) {
   _image.loadPixels();
-  println("_image.width: "+_image.width+", _image.height: "+_image.height);
   PImage half = createImage(_image.width/2, _image.height/2, RGB);
-  println("half.width: "+half.width+", half.height: "+half.height);
   for (int y = 0; y < half.height; y++) {
     for (int x = 0; x < half.width; x++) {
       if (evenX && evenY) half.pixels[x+half.width*y] = _image.pixels[(2*x)+_image.width*(2*y)];

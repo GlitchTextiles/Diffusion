@@ -15,7 +15,7 @@ public class PaletteList {
     paletteList = controlContext.addScrollableList("select_palette")
       .setLabel("select palette")
       .setPosition(grid(0), grid(1))
-      .setSize(grid(6), grid(6))
+      .setSize(grid(6)-2*guiBufferSize, grid(6))
       .setBarHeight(guiObjectSize)
       .setItemHeight(guiObjectSize)
       .setColorForeground(guiForeground)

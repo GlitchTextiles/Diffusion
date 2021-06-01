@@ -48,8 +48,19 @@ public class ControlFrame extends PApplet {
       ;
     cp5.getController("save_image").getCaptionLabel().align(ControlP5.CENTER, CENTER);
 
-    cp5.addToggle("preview")
+    cp5.addButton("generate_gradient")
       .setPosition(grid(2), grid(0))
+      .setSize(guiObjectSize, guiObjectSize)
+      .setColorForeground(guiForeground)
+      .setColorBackground(guiBackground) 
+      .setColorActive(guiActive)
+      .setLabel("GRADIENT")
+      .plugTo(parent, "generate_gradient")
+      ;
+    cp5.getController("generate_gradient").getCaptionLabel().align(ControlP5.CENTER, CENTER);
+
+    cp5.addToggle("preview")
+      .setPosition(grid(3), grid(0))
       .setSize(guiObjectSize, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
@@ -58,9 +69,9 @@ public class ControlFrame extends PApplet {
       .plugTo(parent, "preview")
       ;
     cp5.getController("preview").getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    
+
     cp5.addToggle("resample")
-      .setPosition(grid(3), grid(0))
+      .setPosition(grid(4), grid(0))
       .setSize(guiObjectSize, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
@@ -69,9 +80,9 @@ public class ControlFrame extends PApplet {
       .plugTo(parent, "resample")
       ;
     cp5.getController("resample").getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    
+
     cp5.addToggle("evenOddX")
-      .setPosition(grid(4), grid(0))
+      .setPosition(grid(5), grid(0))
       .setSize(guiObjectSize, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
@@ -79,11 +90,11 @@ public class ControlFrame extends PApplet {
       .setLabel("X\nEVEN")
       .plugTo(parent, "evenX")
       .setValue(0);
-      ;
+    ;
     cp5.getController("evenOddX").getCaptionLabel().align(ControlP5.CENTER, CENTER);
-    
+
     cp5.addToggle("evenOddY")
-      .setPosition(grid(5), grid(0))
+      .setPosition(grid(6), grid(0))
       .setSize(guiObjectSize, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
@@ -91,12 +102,12 @@ public class ControlFrame extends PApplet {
       .setLabel("Y\nEVEN")
       .plugTo(parent, "evenY")
       .setValue(0);
-      ;
+    ;
     cp5.getController("evenOddY").getCaptionLabel().align(ControlP5.CENTER, CENTER);
 
 
     cp5.addButton("quit")
-      .setPosition(this.width-grid(1), grid(0))
+      .setPosition(this.width-grid(1)+guiBufferSize, grid(0))
       .setSize(guiObjectSize, guiObjectSize)
       .setColorForeground(guiForeground)
       .setColorBackground(guiBackground) 
